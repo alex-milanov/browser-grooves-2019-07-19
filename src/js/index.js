@@ -132,5 +132,5 @@ iResize();
 // livereload impl.
 if (module.hot) {
 	document.write(`<script src="http://${(location.host || 'localhost').split(':')[0]}` +
-	`:35729/livereload.js?snipver=1"></script>`);
+	`:35730/livereload.js?snipver=1"></script>`);
 }

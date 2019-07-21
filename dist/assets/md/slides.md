@@ -1,5 +1,5 @@
-# Browser grooves
-a Brief introduction to **WebAudio** and **WebMIDI** APIs
+# Browser grooves v2
+Recording, Sampling and Looping
 
 ## Motivation
 
@@ -7,16 +7,25 @@ a Brief introduction to **WebAudio** and **WebMIDI** APIs
 [![music-tech-meetup-2019-06-11](./assets/img/music-tech-meetup-2019-06-11.png)](./assets/videos/music-tech-meetup-2019-06-11.mp4)
 
 ### My Framework
-![app-architecture](./assets/img/app-architecture.png)
+```mermaid
+graph LR
+	Actions --> State;
+	State --> UI;
+	UI --> Actions;
+```
 
 ### Example
 ```js
+// initial state
+const initial = {num: 0};
+
 // actions
 const actions$ = new Rx.Subject();
 const actions = {
+	// incr
 	incr: () => actions$.onNext(
-		state => ({num: state.num + 1})),
-	initial: {num: 0}
+		state => ({num: state.num + 1})
+	)
 };
 
 // ui
@@ -26,32 +35,68 @@ const ui = ({state, actions}) => div('#ui', [
 	span(`Num: ${state.num}`)
 ]);
 
-// reducing the stream of actions to the app state
+// actions --> state
 const state$ = actions$
-	.startWith(() => actions.initial)
+	.startWith(() => initial)
 	.scan((state, reducer) => reducer(state), {})
 	.share();
 
-// mapping the state to the ui
+// state --> ui
 const ui$ = state$.map(state => ui({state, actions}));
-
 vdom.patchStream(ui$, document.querySelector('#ui'));
 ```
+
+## Apps
+
+### The Jam Station
+![jam-station](./assets/img/jam-station.png)
+
+### The Jam Station
+- Web Based DAW with **WebAudio**, **WebMIDI**, **GamepadAPI** ...
+- includes a Modular Synth and a Beat Sequencer
+- ... Session Manager and MIDI Routing
+- https://github.com/alex-milanov/jam-station
+- https://alex-milanov.github.io/jam-station
+- https://www.youtube.com/watch?v=J-ShH4g7hWM - at Open Fest 2018
+
+### JS Loop Station
+![jam-station](./assets/img/js-loop-station.png)
+
+### JS Loop Station
+- Web Based Looper app
+- Inspiration from Boss/Roland's RC505 Loopstation
+- **WebAudio**, **WebMIDI**, Audio Recording and manipulation
+- https://github.com/alex-milanov/js-loop-station
+- https://alex-milanov.github.io/js-loop-station/dist
+
+### xAmplR
+![jam-station](./assets/img/xamplr.png)
+
+### xAmplR
+- Web based Sampling and Drumpad App, reminiscent of Akai MPC
+- Uses AudioCommons API to search freesound and other CC sample sources
+- Won a price at last years Music Hackathon at Abbey Road Studios
+- https://github.com/alex-milanov/xAmplR
+- https://alex-milanov.github.io/xAmplR/dist/
 
 ## Web Audio
 ![patchage](./assets/img/patchage.jpeg)
 
 ### The Context
-![oscillator-basic](./assets/svg/audiocontext.svg)
+```mermaid
+graph LR
+    AudioContext
+```
 
--
 
 `var context = new AudioContext();`
 
 ### Some Oscillation
-![oscillator-basic](./assets/svg/oscillator-basic.svg)
+```mermaid
+graph LR
+    OscillatorNode --> AudioContext
+```
 
--
 
 `var oscillator = context.createOscillator();`
 
@@ -59,7 +104,10 @@ vdom.patchStream(ui$, document.querySelector('#ui'));
 
 
 ### Make some noise
-![oscillator-basic](./assets/svg/oscillator-basic.svg)
+```mermaid
+graph LR
+    OscillatorNode --> AudioContext
+```
 
 ```js
 // get audio context instance
@@ -85,7 +133,11 @@ document.querySelector('#ui').appendChild(button);
 ```
 
 ### hmm...
-![oscillator-basic](./assets/svg/oscillator-basic.svg)
+```mermaid
+graph LR
+    OscillatorNode --> AudioContext
+```
+
 ```js
 // get audio context instance
 var context = new AudioContext()
@@ -115,7 +167,11 @@ document.querySelector('#ui').appendChild(button);
 ```
 
 ### Mega Gain
-![oscillator-basic](./assets/svg/gain.svg)
+```mermaid
+graph LR
+    A[OscillatorNode] --> B[GainNode]
+		B --> C[AudioContext]
+```
 
 -
 
@@ -126,7 +182,11 @@ document.querySelector('#ui').appendChild(button);
 `volume.connect(context.destination)`
 
 ### Volume Control
-![oscillator-basic](./assets/svg/gain.svg)
+```mermaid
+graph LR
+    A[OscillatorNode] --> B[GainNode]
+		B --> C[AudioContext]
+```
 ```js
 // get audio context instance
 var context = new AudioContext();
@@ -377,44 +437,36 @@ document.querySelector('#ui').appendChild(inputsEl);
 - [Bug 836897 (webmidi) Implement the WebMIDI API](https://bugzilla.mozilla.org/show_bug.cgi?id=836897)
 - Bugzilla: Opened	7 years ago
 
-## Apps
+## Media Streams API
 
-### The Jam Station
-![jam-station](./assets/img/jam-station.png)
+### Media Devices
+```js
 
-### The Jam Station
-- Web Based DAW with **WebAudio**, **WebMIDI**, **GamepadAPI** ...
-- includes a Modular Synth and a Beat Sequencer
-- ... Session Manager and MIDI Routing
-- https://github.com/alex-milanov/jam-station
-- https://alex-milanov.github.io/jam-station
-- https://www.youtube.com/watch?v=J-ShH4g7hWM - at Open Fest 2018
+// List cameras and microphones.
+navigator.mediaDevices.enumerateDevices()
+	.then(function(devices) {
+	  devices
+			.filter(d => d.kind === 'audioinput')
+			.forEach(function(device) {
+				devicesEl.innerHTML += '\n' + (device.kind + ": " + device.deviceId);
+	  	});
+	});
 
-### JS Loop Station
-![jam-station](./assets/img/js-loop-station.png)
+// ui
+var devicesEl = document.createElement('pre');
+devicesEl.innerHTML = 'Devices:';
+document.querySelector('#ui').appendChild(devicesEl);
+```
 
-### JS Loop Station
-- Web Based Looper app
-- Inspiration from Boss/Roland's RC505 Loopstation
-- **WebAudio**, **WebMIDI**, Audio Recording and manipulation
-- https://github.com/alex-milanov/js-loop-station
-- https://alex-milanov.github.io/js-loop-station/dist
+### Create Stream
+```js
+navigator.mediaDevices.getUserMedia({audio: {deviceId: 'default'}})
+```
 
-### xAmplR
-![jam-station](./assets/img/xamplr.png)
-
-### xAmplR
-- Web based Sampling and Drumpad App, reminiscent of Akai MPC
-- Uses AudioCommons API to search freesound and other CC sample sources
-- Won a price at last years Music Hackathon at Abbey Road Studios
-- https://github.com/alex-milanov/xAmplR
-- https://alex-milanov.github.io/xAmplR/dist/
-
-## Other Examples
-- https://webaudiodemos.appspot.com/
-- http://nicroto.github.io/viktor/
-- https://io808.com/
-- https://www.webaudiomodules.org/wamsynths/dexed
+### MediaRecorder
+```js
+new window.MediaRecorder(stream, {audioBitsPerSecond: 32000});
+```
 
 ## Links
 
@@ -430,10 +482,8 @@ document.querySelector('#ui').appendChild(inputsEl);
 - https://www.meetup.com/MusicTechBG/
 - http://musictech.bg - soon(ish)
 
-### Graphics
-- [Background Photo](https://unsplash.com/photos/HwFv8EZYC_o) by Manuel Sardo on Unsplash
-
 ## Next
-![MusicTechMeetupVarna](./assets/img/MusicTechMeetupVarna.png)
-- 18.06 19:30 Music Tech Meetup | Varna vol2
-- https://www.facebook.com/events/461877467905846/
+![MusicTechMeetupBurgas](./assets/img/MusicTechMeetupBurgas.png)
+- **Music Tech Meetup | Burgas**
+- 23.07 19:30 @ **BurgasLab**
+- https://www.facebook.com/events/1357965591035754/

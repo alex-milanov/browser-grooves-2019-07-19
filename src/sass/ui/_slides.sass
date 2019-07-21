@@ -1,9 +1,10 @@
 .slides
 	+pos
 	overflow: hidden
-	background-color: rgba(#0B295B, 0.7)
+	background-color: rgba(#0B295B, 0.3)
 	perspective: 1200px
 	transform-style: preserve-3d
+	animation: fadeIn .6s .4s ease both
 	section
 		position: absolute
 		visibility: hidden
@@ -21,8 +22,9 @@
 		// background: radial-gradient(ellipse at center, rgba(#cedce7, 1) 0%, rgba(#596a72, 1) 100%)
 		// #0b5b3a, #31969b
 		// background: radial-gradient(ellipse at center, rgba(#7f0e76, 0.3) 0%, rgba(#a544d6, 0.5) 80%, rgba(#a544d6, 0.7) 100%)
-		background: radial-gradient(ellipse at center, rgba(#0B295B, 0.1) 0%, rgba(#397BB2, 0.3) 70%, rgba(#397BB2, 0.5) 100%)
+		// background: radial-gradient(ellipse at center, rgba(#0B295B, 0.1) 0%, rgba(#397BB2, 0.3) 70%, rgba(#397BB2, 0.5) 100%)
 		z-index: 0
+		// animation: fadeIn .6s .4s ease both
 		> span
 			+centerer
 			left: 0px

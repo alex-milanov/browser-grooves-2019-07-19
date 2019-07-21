@@ -5,14 +5,20 @@ const Rx = require('rx');
 const $ = Rx.Observable;
 
 const prettify = require('code-prettify');
-
+const mermaidAPI = require('mermaid');
 const {obj} = require('iblokz-data');
+
+mermaidAPI.initialize({
+	theme: 'dark',
+	themeCSS: '.node rect {fill: #11172c; stroke: #BDD5EA; stroke-width: 2px} .label {color: #BDD5EA; font-size: 16px; font-weight: bold}',
+	startOnLoad: false
+});
 
 // dom
 const {
 	h, section, button, span, h1, h2, h3,
 	form, fieldset, label, legend, input, select, option,
-	ul, li, p
+	ul, li, p, div
 } = require('iblokz-snabbdom-helpers');
 
 // components
@@ -31,14 +37,22 @@ const prepAnim = (pos, {index, old, direction, transitioning, anim}) => Object.a
 	: {}
 );
 
-const parseEl = el => (el.tag === 'code')
-	? code({source: el.text, type: el.type})
+const mermaid = (el, uid) => div(`.mermaid-${uid}`, {
+	props: {
+		innerHTML: mermaidAPI.render(`mermaid-${uid}`, el.text)
+	}
+});
+
+const parseEl = (el, uid) => (el.tag === 'code')
+	? el.type === 'mermaid'
+		? mermaid(el, uid)
+		: code({source: el.text, type: el.type})
 	: (el.tag === 'p' || el.tag === 'li')
 		? h(el.tag, {props: {innerHTML: el.text}})
-		: h(el.tag, el.text || el.children && el.children.map(parseEl) || '');
+		: h(el.tag, el.text || el.children && el.children.map(ch => parseEl(ch, uid)) || '');
 
-const parseSlides = slides => slides.map(col =>
-	col.map(parseEl)
+const parseSlides = slides => slides.map((col, i) =>
+	col.map((slide, k) => parseEl(slide, `${i}-${k}`))
 );
 
 module.exports = ({state, actions}) => section('.slides.fadeIn[tabindex="0"]',

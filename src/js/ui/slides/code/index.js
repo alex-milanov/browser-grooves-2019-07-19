@@ -56,7 +56,7 @@ const sandbox = (source, iframe, context = {}, cb) => {
 			$,
 			vdom,
 			app,
-			navigator
+			_navigator: navigator || {}
 		}));
 	} catch (e) {
 		err = e;
