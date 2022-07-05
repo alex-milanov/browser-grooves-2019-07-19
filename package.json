@@ -27,7 +27,7 @@
     "iblokz-data": "^1.2.0",
     "iblokz-snabbdom-helpers": "^1.2.0",
     "marked": "^0.3.6",
-    "mermaid": "^8.1.0",
+    "mermaid": "^9.1.2",
     "raf": "^3.4.0",
     "raf-stream": "^3.0.0",
     "rx": "^4.1.0",
